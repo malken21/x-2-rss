@@ -1,0 +1,34 @@
+name: PostWatcher
+on:
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch:
+jobs:
+  post-watcher:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Configure Git user
+        run: |
+          git config --local user.email ""
+          git config --local user.name "PostWatcher"
+      - name: Create sessions.jsonl
+        run: |
+          echo '${{ secrets.SESSIONS }}' > sessions.jsonl
+      - name: Docker Compose
+        run: |
+          docker compose up -d
+      - name: Get RSS
+        run: |
+          curl http://localhost/MarumasaJs/rss
+      - name: Add and commit changes
+        continue-on-error: true
+        run: |
+          git add .
+          git commit -m "test"
+          git push origin main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+permissions:
+  contents: write
