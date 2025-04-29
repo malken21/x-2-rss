@@ -10,12 +10,16 @@ def get_users
   end
 end
 
+def replace_http_with_https(text)
+  text.gsub("http://", "https://")
+end
+
 def download(url, path)
   FileUtils.mkdir_p(File.dirname(path))
-  URI.open(url) do |uri|
-    File.open(path, "wb") do |f|
-      IO.copy_stream(uri, f)
-    end
+  content = URI.open(url).read
+  replaced_content = replace_http_with_https(content)
+  File.open(path, "w") do |local_file|
+    local_file.write(replaced_content)
   end
 end
 
