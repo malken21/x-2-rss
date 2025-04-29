@@ -29,8 +29,8 @@ if __FILE__ == $0
   usersText = ""
 
   get_users.each do |item|
-    download("http://#{Address}/#{item}/rss", "dist/#{item}")
-    usersText << "## [#{item}](./#{item})\n"
+    download("http://#{Address}/#{item}/rss", "dist/#{item}.rss")
+    usersText << "## [#{item}](./#{item}.rss)\n"
   end
 
   saveREADME("dist/README.md", usersText)
