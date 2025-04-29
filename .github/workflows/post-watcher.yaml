@@ -1,7 +1,7 @@
 name: PostWatcher
 on:
   schedule:
-    - cron: '0 * * * *'
+    - cron: '*/10 * * * *'
   workflow_dispatch:
 jobs:
   post-watcher:
@@ -19,16 +19,18 @@ jobs:
       - name: Docker Compose
         run: |
           docker compose up -d
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4'
+          bundler-cache: true
       - name: Get RSS
         run: |
-          curl http://localhost/MarumasaJs/rss
-      - name: Add and commit changes
-        continue-on-error: true
-        run: |
-          git add .
-          git commit -m "test"
-          git push origin main
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ruby get-rss.rb
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          folder: dist
 permissions:
   contents: write
